@@ -48,9 +48,38 @@ return {
     -- set keymaps
     local keymap = vim.keymap -- for conciseness
 
+    -- function to handle split actions
+    local function open_nvim_tree_split(split_type)
+      return function()
+        local lib = require("nvim-tree.lib")
+        local node = lib.get_node_at_cursor()
+        if node then
+          if split_type == "vsplit" then
+            vim.cmd("vsplit")
+          else
+            vim.cmd("split")
+          end
+          vim.cmd("edit " .. node.absolute_path)
+        end
+      end
+    end
+
     keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" }) -- toggle file explorer
     keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Toggle file explorer on current file" }) -- toggle file explorer on current file
     keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse file explorer" }) -- collapse file explorer
     keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh file explorer" }) -- refresh file explorer
-  end
+
+    keymap.set(
+      "n",
+      "<leader>ev",
+      open_nvim_tree_split("vsplit"),
+      { silent = true, noremap = true, desc = "Open in vertical split" }
+    )
+    keymap.set(
+      "n",
+      "<leader>eh",
+      open_nvim_tree_split("split"),
+      { silent = true, noremap = true, desc = "Open in horizontal split" }
+    )
+  end,
 }
